@@ -37,5 +37,17 @@ class Book {
         return $this->libraryId;
     }
 
- 
+    
+    public function setStatus($status) {
+        $this->status = $status;
+    }
+
+    public function setLibraryId($libraryId) {
+        $this->libraryId = $libraryId;
+    }
+
+    
+    public function __toString() {
+        return "Book: {$this->title} by {$this->author} ({$this->status})";
+    }
 }
