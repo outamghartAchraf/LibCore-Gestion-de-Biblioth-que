@@ -32,4 +32,10 @@ abstract class User
     {
         $this->email = $email;
     }
+
+    public function __toString()
+    {
+
+        return "Name: " . $this->name . " , Email: " . $this->email;
+    }
 }
