@@ -80,7 +80,25 @@ class Library
         $stmt->execute([$bookId]);
 
         echo "Book borrowed successfully!\n";
-        
+
+    }
+
+    public function returnBook($loanId, $bookId)
+    {
+        $stmtLoad = $this->pdo->prepare("
+            UPDATE loans 
+            SET status = 'returned', return_date = CURDATE()
+            WHERE id = ?
+        ");
+
+        $stmtLoad->execute([$loanId]);
+
+        $stmt = $this->pdo->prepare("
+            UPDATE books SET status = 'available' WHERE id = ?
+        ");
+        $stmt->execute([$bookId]);
+
+        echo "Book returned successfully!\n";
     }
 
 
