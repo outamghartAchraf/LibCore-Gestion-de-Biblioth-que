@@ -22,5 +22,7 @@ class Librarian extends User {
     }
 
     
-
+    public function __toString() {
+        return "Librarian: {$this->name} ({$this->employeeId})";
+    }
 }
