@@ -101,6 +101,17 @@ class Library
         echo "Book returned successfully!\n";
     }
 
+    public function deleteBook($bookId)
+    {
+        $stmt = $this->pdo->prepare("
+            DELETE FROM books WHERE id = ?
+        ");
+        $stmt->execute([$bookId]);
+
+        echo "Book deleted successfully!\n";
+
+    }
+
 
 }
 
