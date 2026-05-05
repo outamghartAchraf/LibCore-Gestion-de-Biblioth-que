@@ -35,7 +35,7 @@ class Library
         echo "Book added successfully\n";
     }
 
-    public function addMember($name, $email,$type, $membership_no, $is_active)
+    public function addMember($name, $email, $type, $membership_no, $is_active)
     {
         $stmt = $this->pdo->prepare("
             INSERT INTO users (name, email)
@@ -53,6 +53,34 @@ class Library
         $stmt->execute([$userId, $type, $membership_no]);
         echo "Member created successfully\n";
 
+    }
+
+    public function borrowBook($memberId, $bookId)
+    {
+        $stateSql = $this->pdo->prepare("
+            SELECT status FROM books WHERE id = ?
+        ");
+        $stateSql->execute([$bookId]);
+        $book = $stateSql->fetch(PDO::FETCH_OBJ);
+
+        if (!$book || $book->status !== "available") {
+            echo "Book not available\n";
+            return;
+        }
+
+        $stmtLoans = $this->pdo->prepare("
+            INSERT INTO loans (member_id, book_id, borrow_date, status)
+            VALUES (?, ?, CURDATE(), 'borrowed')
+        ");
+        $stmtLoans->execute([$memberId, $bookId]);
+
+        $stmt = $this->pdo->prepare("
+            UPDATE books SET status = 'borrowed' WHERE id = ?
+        ");
+        $stmt->execute([$bookId]);
+
+        echo "Book borrowed successfully!\n";
+        
     }
 
 
