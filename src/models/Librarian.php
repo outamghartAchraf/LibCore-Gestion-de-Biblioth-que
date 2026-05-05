@@ -11,6 +11,16 @@ class Librarian extends User {
         parent::__construct($name, $email);
         $this->employeeId = $employeeId;
     }
+ 
+    public function getEmployeeId() {
+        return $this->employeeId;
+    }
 
+ 
+    public function setEmployeeId($employeeId) {
+        $this->employeeId = $employeeId;
+    }
+
+    
 
 }
