@@ -22,7 +22,8 @@ class Library
         }
     }
 
-    public function addBook($title, $author, $isbn, $libraryId) {
+    public function addBook($title, $author, $isbn, $libraryId)
+    {
 
         $stmt = $this->pdo->prepare("
             INSERT INTO books (title, author, isbn, status, library_id)
@@ -32,6 +33,26 @@ class Library
         $stmt->execute([$title, $author, $isbn, $libraryId]);
 
         echo "Book added successfully\n";
+    }
+
+    public function addMember($name, $email,$type, $membership_no, $is_active)
+    {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO users (name, email)
+            VALUES (?, ?)
+        ");
+
+        $stmt->execute([$name, $email]);
+        $userId = $this->pdo->lastInsertId();
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO members (user_id, type, membership_no, is_active)
+            VALUES (?, ?, ?, 1)
+        ");
+
+        $stmt->execute([$userId, $type, $membership_no]);
+        echo "Member created successfully\n";
+
     }
 
 
