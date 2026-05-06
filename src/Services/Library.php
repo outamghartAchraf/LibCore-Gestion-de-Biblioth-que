@@ -93,10 +93,10 @@ class Library
 
         $stmtLoad->execute([$loanId]);
 
-        $stmt = $this->pdo->prepare("
+        $stateBook = $this->pdo->prepare("
             UPDATE books SET status = 'available' WHERE id = ?
         ");
-        $stmt->execute([$bookId]);
+        $stateBook->execute([$bookId]);
 
         echo "Book returned successfully!\n";
     }

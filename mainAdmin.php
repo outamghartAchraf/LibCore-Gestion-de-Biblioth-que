@@ -3,7 +3,7 @@
 require_once __DIR__ . "/src/Services/Library.php";
 
 
-
+$library = new Library();
 while (true) {
 
     echo "\n===================================\n";
@@ -23,6 +23,34 @@ while (true) {
     $choice = readline();
 
     switch ($choice) {
+        case 1 :
+            $library->getAllBooks();
+            break;
+
+        case 2:
+
+            echo "Enter Title: ";
+            flush();
+            $title = trim(readline());
+
+            echo "Enter Author: ";
+            flush();
+            $author = trim(readline());
+
+            echo "Enter ISBN: ";
+            flush();
+            $isbn = trim(readline());
+
+            echo "Enter Library ID: ";
+            flush();
+            $libraryId = (int)readline();
+
+            $library->addBook($title, $author, $isbn, $libraryId);
+
+            break;
+
+ 
+
 
     }
 }

@@ -1,9 +1,7 @@
 <?php
 
 require_once __DIR__ . "/Env.php";
-
 Env::load(__DIR__ . "/../.env");
-
 class DB {
 
     public static function connect() {
@@ -25,4 +23,3 @@ class DB {
     }
 }
 
-echo DB::connect() ? "DB connection" : "falid";
