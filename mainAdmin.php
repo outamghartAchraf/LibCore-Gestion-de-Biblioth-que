@@ -16,7 +16,8 @@ while (true) {
     echo "4. Borrow Book\n";
     echo "5. Return Book\n";
     echo "6. Delete Book\n";
-    echo "7. Exit\n";
+    echo "7. mark Repair Book\n";
+    echo "8. Exit\n";
 
     echo "Choose option: ";
     flush();
@@ -68,7 +69,7 @@ while (true) {
             $membershipNo = trim(readline());
 
 
-            if (empty($name) || empty($email) || empty($type) ||  empty($membershipNo) ) {
+            if (empty($name) || empty($email) || empty($type) || empty($membershipNo)) {
                 echo "All fields are required\n";
                 break;
             }
@@ -83,14 +84,15 @@ while (true) {
 
             echo "Enter Member ID: ";
             flush();
-            $memberId = (int) readline();
+            $memberId = (int)readline();
 
             echo "Enter Book ID: ";
             flush();
-            $bookId = (int) readline();
+            $bookId = (int)readline();
 
 
             if (empty($memberId) || empty($bookId)) {
+
                 echo "Member ID and Book ID are required\n";
                 break;
             }
@@ -99,5 +101,25 @@ while (true) {
 
             break;
 
+        case 5:
+
+            echo "Enter Loan ID: ";
+            flush();
+            $loanId = (int)readline();
+
+            echo "Enter Book ID: ";
+            flush();
+            $bookId = (int)readline();
+
+            if (empty($loanId)  || empty($bookId) ) {
+                echo "Loan ID and Book ID are required\n";
+                break;
+            }
+
+            $library->returnBook($loanId, $bookId);
+
+            break;
+
+        
     }
 }
