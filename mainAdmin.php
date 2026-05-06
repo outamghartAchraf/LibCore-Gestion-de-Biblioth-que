@@ -76,5 +76,28 @@ while (true) {
             $library->createMember($name, $email, $type, $membershipNo);
 
             break;
+
+        case 4:
+
+            $library->getAllBooks();
+
+            echo "Enter Member ID: ";
+            flush();
+            $memberId = (int) readline();
+
+            echo "Enter Book ID: ";
+            flush();
+            $bookId = (int) readline();
+
+
+            if (empty($memberId) || empty($bookId)) {
+                echo "Member ID and Book ID are required\n";
+                break;
+            }
+
+            $library->borrowBook($memberId, $bookId);
+
+            break;
+
     }
 }

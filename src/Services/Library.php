@@ -112,6 +112,19 @@ class Library
 
     }
 
+    public function markAsRepair($bookId)
+    {
+        $stmt = $this->pdo->prepare("
+        UPDATE books 
+        SET status = 'repair' 
+        WHERE id = ?
+    ");
+
+        $stmt->execute([$bookId]);
+
+        echo "Book marked as under repair\n";
+    }
+
 
 }
 
