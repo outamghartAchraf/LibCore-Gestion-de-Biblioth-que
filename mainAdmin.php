@@ -49,8 +49,32 @@ while (true) {
 
             break;
 
- 
+        case 3:
+
+            echo "Enter Name: ";
+            flush();
+            $name = trim(readline());
+
+            echo "Enter Email: ";
+            flush();
+            $email = trim(readline());
+
+            echo "Enter Type (student/professor): ";
+            flush();
+            $type = trim(readline());
+
+            echo "Enter Membership No: ";
+            flush();
+            $membershipNo = trim(readline());
 
 
+            if (empty($name) || empty($email) || empty($type) ||  empty($membershipNo) ) {
+                echo "All fields are required\n";
+                break;
+            }
+
+            $library->createMember($name, $email, $type, $membershipNo);
+
+            break;
     }
 }
