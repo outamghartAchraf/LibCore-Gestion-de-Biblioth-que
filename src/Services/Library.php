@@ -35,7 +35,7 @@ class Library
         echo "Book added successfully\n";
     }
 
-    public function addMember($name, $email, $type, $membership_no, $is_active)
+    public function addMember($name, $email, $type, $membership_no)
     {
         $stmt = $this->pdo->prepare("
             INSERT INTO users (name, email)

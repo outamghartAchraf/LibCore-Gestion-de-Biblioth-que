@@ -16,7 +16,7 @@ while (true) {
     echo "4. Borrow Book\n";
     echo "5. Return Book\n";
     echo "6. Delete Book\n";
-    echo "7. mark Repair Book\n";
+    echo "7. Mark Book as Under Repair\n";
     echo "8. Exit\n";
 
     echo "Choose option: ";
@@ -24,7 +24,7 @@ while (true) {
     $choice = readline();
 
     switch ($choice) {
-        case 1 :
+        case 1:
             $library->getAllBooks();
             break;
 
@@ -74,7 +74,7 @@ while (true) {
                 break;
             }
 
-            $library->createMember($name, $email, $type, $membershipNo);
+            $library->addMember($name, $email, $type, $membershipNo);
 
             break;
 
@@ -111,7 +111,7 @@ while (true) {
             flush();
             $bookId = (int)readline();
 
-            if (empty($loanId)  || empty($bookId) ) {
+            if (empty($loanId) || empty($bookId)) {
                 echo "Loan ID and Book ID are required\n";
                 break;
             }
@@ -120,6 +120,38 @@ while (true) {
 
             break;
 
-        
+        case 6:
+
+            $library->getAllBooks();
+
+            echo "Enter Book ID to delete: ";
+            flush();
+            $bookId = (int)readline();
+
+            if (empty($bookId)) {
+                echo "Required Book ID\n";
+                break;
+            }
+
+            $library->deleteBook($bookId);
+
+            break;
+
+        case 7:
+            $library->getAllBooks();
+
+            echo "Enter Book ID to delete: ";
+            flush();
+            $bookId = (int)readline();
+
+            if (empty($bookId)) {
+                echo "Required Book ID\n";
+                break;
+            }
+
+            $library->markAsRepair($bookId);
+
     }
+
+
 }
