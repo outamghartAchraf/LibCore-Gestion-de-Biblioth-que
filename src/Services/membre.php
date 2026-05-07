@@ -29,6 +29,11 @@ while (true) {
     $library->returnBook($emprunter, $bookID);
             break;
 
+            case 0:
+                exit("Au revoir ! merci pour votre visite");
+
+                
+
     }
 
 
