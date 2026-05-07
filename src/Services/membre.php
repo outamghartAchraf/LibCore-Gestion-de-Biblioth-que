@@ -18,10 +18,16 @@ while (true) {
             break;
 
             case 2:
-                $membreID=readline("Entrez Membre ID:");
-                $bookID=readline("Entrez Book ID:");
+                $membreID=readline("Entrez Membre identifiant:");
+                $bookID=readline("Entrez l'identifiant du livre:");
 
                 $library->borrowBook($membreID,$bookID);
+                break;
+            case 3:
+                $emprunter=readline("Entrez Id emprunté");
+                $bookID=readline("Entrez Id book");
+
+
     }
 
 
