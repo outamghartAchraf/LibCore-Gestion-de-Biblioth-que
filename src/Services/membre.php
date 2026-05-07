@@ -32,7 +32,7 @@ while (true) {
             case 0:
                 exit("Au revoir ! merci pour votre visite");
 
-                
+          default: echo "L'option n'est pas valide\n";      
 
     }
 
