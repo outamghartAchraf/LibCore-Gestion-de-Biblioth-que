@@ -20,6 +20,8 @@ while (true) {
             case 2:
                 $membreID=readline("Entrez Membre ID:");
                 $bookID=readline("Entrez Book ID:");
+
+                $library->borrowBook($membreID,$bookID);
     }
 
 
