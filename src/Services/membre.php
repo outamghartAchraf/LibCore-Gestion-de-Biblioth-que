@@ -26,7 +26,8 @@ while (true) {
             case 3:
                 $emprunter=readline("Entrez Id emprunté");
                 $bookID=readline("Entrez Id book");
-
+    $library->returnBook($emprunter, $bookID);
+            break;
 
     }
 
