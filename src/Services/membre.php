@@ -16,6 +16,10 @@ while (true) {
         case 1:
             $library->getAllBooks();
             break;
+
+            case 2:
+                $membreID=readline("Entrez Membre ID:");
+                $bookID=readline("Entrez Book ID:");
     }
 
 
