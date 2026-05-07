@@ -12,7 +12,12 @@ while (true) {
        echo "\n 0-Quitter \n";
        $choix= readline("Choissisez une option");
        
-       
+    switch ($choix){
+        case 1:
+            $library->getAllBooks();
+            break;
+    }
+
 
     
 }
