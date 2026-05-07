@@ -22,8 +22,23 @@ class Library
         }
     }
 
-    public function addBook($title, $author, $isbn, $libraryId)
+    public function addBook()
     {
+        echo "Enter Title: ";
+        flush();
+        $title = trim(readline());
+
+        echo "Enter Author: ";
+        flush();
+        $author = trim(readline());
+
+        echo "Enter ISBN: ";
+        flush();
+        $isbn = trim(readline());
+
+        echo "Enter Library ID: ";
+        flush();
+        $libraryId = (int)readline();
 
         $stmt = $this->pdo->prepare("
             INSERT INTO books (title, author, isbn, status, library_id)
@@ -35,8 +50,29 @@ class Library
         echo "Book added successfully\n";
     }
 
-    public function addMember($name, $email, $type, $membership_no)
+    public function addMember()
     {
+        echo "Enter Name: ";
+        flush();
+        $name = trim(readline());
+
+        echo "Enter Email: ";
+        flush();
+        $email = trim(readline());
+
+        echo "Enter Type (student/professor): ";
+        flush();
+        $type = trim(readline());
+
+        echo "Enter Membership No: ";
+        flush();
+        $membership_no = trim(readline());
+
+
+        if (empty($name) || empty($email) || empty($type) || empty($membership_no)) {
+            echo "All fields are required\n";
+            exit;
+        }
         $stmt = $this->pdo->prepare("
             INSERT INTO users (name, email)
             VALUES (?, ?)
@@ -55,8 +91,23 @@ class Library
 
     }
 
-    public function borrowBook($memberId, $bookId)
+    public function borrowBook()
     {
+        echo "Enter Member ID: ";
+        flush();
+        $memberId = (int)readline();
+
+        echo "Enter Book ID: ";
+        flush();
+        $bookId = (int)readline();
+
+
+        if (empty($memberId) || empty($bookId)) {
+
+            echo "Member ID and Book ID are required\n";
+            exit;
+        }
+
         $stateSql = $this->pdo->prepare("
             SELECT status FROM books WHERE id = ?
         ");
@@ -83,8 +134,21 @@ class Library
 
     }
 
-    public function returnBook($loanId, $bookId)
+    public function returnBook()
     {
+        echo "Enter Loan ID: ";
+        flush();
+        $loanId = (int)readline();
+
+        echo "Enter Book ID: ";
+        flush();
+        $bookId = (int)readline();
+
+        if (empty($loanId) || empty($bookId)) {
+            echo "Loan ID and Book ID are required\n";
+            exit;
+        }
+
         $stmtLoad = $this->pdo->prepare("
             UPDATE loans 
             SET status = 'returned', return_date = CURDATE()
@@ -101,8 +165,16 @@ class Library
         echo "Book returned successfully!\n";
     }
 
-    public function deleteBook($bookId)
+    public function deleteBook()
     {
+        echo "Enter Book ID to delete: ";
+        flush();
+        $bookId = (int)readline();
+
+        if (empty($bookId)) {
+            echo "Required Book ID\n";
+            exit;
+        }
         $stmt = $this->pdo->prepare("
             DELETE FROM books WHERE id = ?
         ");
@@ -112,8 +184,16 @@ class Library
 
     }
 
-    public function markAsRepair($bookId)
+    public function markAsRepair()
     {
+        echo "Enter Book ID to delete: ";
+        flush();
+        $bookId = (int)readline();
+
+        if (empty($bookId)) {
+            echo "Required Book ID\n";
+            exit;
+        }
         $stmt = $this->pdo->prepare("
         UPDATE books 
         SET status = 'repair' 

@@ -2,7 +2,6 @@
 
 require_once __DIR__ . "/src/Services/Library.php";
 
-
 $library = new Library();
 while (true) {
 
@@ -17,11 +16,12 @@ while (true) {
     echo "5. Return Book\n";
     echo "6. Delete Book\n";
     echo "7. Mark Book as Under Repair\n";
-    echo "8. Exit\n";
+    echo "0. Exit\n";
 
     echo "Choose option: ";
     flush();
     $choice = readline();
+
 
     switch ($choice) {
         case 1:
@@ -30,126 +30,44 @@ while (true) {
 
         case 2:
 
-            echo "Enter Title: ";
-            flush();
-            $title = trim(readline());
-
-            echo "Enter Author: ";
-            flush();
-            $author = trim(readline());
-
-            echo "Enter ISBN: ";
-            flush();
-            $isbn = trim(readline());
-
-            echo "Enter Library ID: ";
-            flush();
-            $libraryId = (int)readline();
-
-            $library->addBook($title, $author, $isbn, $libraryId);
-
+            $library->addBook();
             break;
 
         case 3:
 
-            echo "Enter Name: ";
-            flush();
-            $name = trim(readline());
-
-            echo "Enter Email: ";
-            flush();
-            $email = trim(readline());
-
-            echo "Enter Type (student/professor): ";
-            flush();
-            $type = trim(readline());
-
-            echo "Enter Membership No: ";
-            flush();
-            $membershipNo = trim(readline());
-
-
-            if (empty($name) || empty($email) || empty($type) || empty($membershipNo)) {
-                echo "All fields are required\n";
-                break;
-            }
-
-            $library->addMember($name, $email, $type, $membershipNo);
-
+            $library->addMember();
             break;
 
         case 4:
 
             $library->getAllBooks();
-
-            echo "Enter Member ID: ";
-            flush();
-            $memberId = (int)readline();
-
-            echo "Enter Book ID: ";
-            flush();
-            $bookId = (int)readline();
-
-
-            if (empty($memberId) || empty($bookId)) {
-
-                echo "Member ID and Book ID are required\n";
-                break;
-            }
-
-            $library->borrowBook($memberId, $bookId);
+            $library->borrowBook();
 
             break;
 
         case 5:
 
-            echo "Enter Loan ID: ";
-            flush();
-            $loanId = (int)readline();
-
-            echo "Enter Book ID: ";
-            flush();
-            $bookId = (int)readline();
-
-            if (empty($loanId) || empty($bookId)) {
-                echo "Loan ID and Book ID are required\n";
-                break;
-            }
-
-            $library->returnBook($loanId, $bookId);
-
+            $library->returnBook();
             break;
 
         case 6:
 
             $library->getAllBooks();
-
-            echo "Enter Book ID to delete: ";
-            flush();
-            $bookId = (int)readline();
-
-            if (empty($bookId)) {
-                echo "Required Book ID\n";
-                break;
-            }
-
-            $library->deleteBook($bookId);
+            $library->deleteBook();
 
             break;
 
         case 7:
+
             $library->getAllBooks();
+            $library->markAsRepair();
 
-            echo "Enter Book ID to delete: ";
-            flush();
-            $bookId = (int)readline();
+        case 0:
+            echo "GOOD BY";
+            exit;
 
-            if (empty($bookId)) {
-                echo "Required Book ID\n";
-                break;
-            }
-
-            $library->markAsRepair($bookId);
+        default :
+            echo "invalide operation !";
 
     }
 
