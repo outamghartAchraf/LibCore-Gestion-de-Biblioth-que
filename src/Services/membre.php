@@ -45,12 +45,18 @@ while (true) {
             echo "Auteur: {$book['author']} | ";
             echo "Status: {$book['status']}\n";
              
-
-
+ 
+                        $trouveLivre= true;
                 }
                  
 
                 }
+
+                if (!$trouveLivre) {
+        echo "Aucun livre trouvé.\n";
+    }
+
+    break;
 
             case 0:
                 exit("Au revoir ! merci pour votre visite");
