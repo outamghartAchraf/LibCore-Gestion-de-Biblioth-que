@@ -37,6 +37,21 @@ while (true) {
                 $book=$library->getAllBooks();
                 $trouveLivre= false;
 
+                foreach ($books as $book){
+                 
+                if( stripos($book['title'],$input) !== false || stripos($book['author'],$input) !==false  ){
+            echo "ID: {$book['id']} | ";
+            echo "Titre: {$book['title']} | ";
+            echo "Auteur: {$book['author']} | ";
+            echo "Status: {$book['status']}\n";
+             
+
+
+                }
+                 
+
+                }
+
             case 0:
                 exit("Au revoir ! merci pour votre visite");
 
