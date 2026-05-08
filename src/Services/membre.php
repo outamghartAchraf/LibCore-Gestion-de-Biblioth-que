@@ -1,72 +1,91 @@
 <?php
-require_once __DIR__ . "/library.php";
 
-$library = new Library();
+require_once __DIR__ . "/../../config/db.php";
 
-echo " ==== DASHBOARD MEMBRE ====\n";
+class MemberService
+{
+    private $pdo;
 
-while (true) {
-    echo "\n 1-Afficher tout les livres \n";
-     echo "\n 2-emprunter un livre \n";
-      echo "\n 3-Retourner un livre \n";
-      echo "\n 4-Rechercher un livre \n";
-       echo "\n 0-Quitter \n";
-       $choix= readline("Choissisez une option");
-       
-    switch ($choix){
-        case 1:
-            $library->getAllBooks();
-            break;
-
-            case 2:
-                $membreID=readline("Entrez Membre identifiant:");
-                $bookID=readline("Entrez l'identifiant du livre:");
-
-                $library->borrowBook($membreID,$bookID);
-                break;
-            case 3:
-                $emprunter=readline("Entrez Id emprunté");
-                $bookID=readline("Entrez Id book");
-    $library->returnBook($emprunter, $bookID);
-            break;
-
-
-            case 4:
-
-                $input=readline("Entrez le titre ou l'auteur:");
-                $books=$library->getAllBooks();
-                $trouveLivre= false;
-
-                foreach ($books as $book){
-                 
-                if( stripos($book['title'],$input) !== false || stripos($book['author'],$input) !==false  ){
-
-
-            echo "ID: {$book['id']} | ";
-            echo "Titre: {$book['title']} | ";
-            echo "Auteur: {$book['author']} | ";
-            echo "Status: {$book['status']}\n";
-             
- 
-                        $trouveLivre= true;
-                }
-                 
-
-                }
-
-                if (!$trouveLivre) {
-        echo "Aucun livre trouvé.\n";
+    public function __construct()
+    {
+        $this->pdo = DB::connect();
     }
 
-    break;
-
-            case 0:
-                exit("Au revoir ! merci pour votre visite");
-
-          default: echo "L'option n'est pas valide\n";      
-
+    public function getAllBooks()
+    {
+        $sql = $this->pdo->query("SELECT * FROM books");
+        return $sql->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function borrowBook($memberId, $bookId)
+    {
+        if (empty($memberId) || empty($bookId)) {
+            echo "Member ID and Book ID are required\n";
+            return;
+        }
 
-    
+        $check = $this->pdo->prepare("SELECT status FROM books WHERE id = ?");
+        $check->execute([$bookId]);
+        $book = $check->fetch(PDO::FETCH_OBJ);
+
+        if (!$book || $book->status !== "available") {
+            echo "Book not available\n";
+            return;
+        }
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO loans (member_id, book_id, borrow_date, status)
+            VALUES (?, ?, CURDATE(), 'borrowed')
+        ");
+        $stmt->execute([$memberId, $bookId]);
+
+        $update = $this->pdo->prepare("
+            UPDATE books SET status = 'borrowed' WHERE id = ?
+        ");
+        $update->execute([$bookId]);
+
+        echo "Book borrowed successfully!\n";
+    }
+
+    public function returnBook($loanId, $bookId)
+    {
+        if (empty($loanId) || empty($bookId)) {
+            echo "Loan ID and Book ID are required\n";
+            return;
+        }
+
+        $stmt = $this->pdo->prepare("
+            UPDATE loans 
+            SET status = 'returned', return_date = CURDATE()
+            WHERE id = ?
+        ");
+        $stmt->execute([$loanId]);
+
+        $update = $this->pdo->prepare("
+            UPDATE books SET status = 'available' WHERE id = ?
+        ");
+        $update->execute([$bookId]);
+
+        echo "Book returned successfully!\n";
+    }
+
+    public function searchBook($input)
+    {
+        $books = $this->getAllBooks();
+        $found = false;
+
+        foreach ($books as $book) {
+            if (
+                stripos($book->title, $input) !== false ||
+                stripos($book->author, $input) !== false
+            ) {
+                echo "ID: {$book->id} | Title: {$book->title} | Author: {$book->author} | Status: {$book->status}\n";
+                $found = true;
+            }
+        }
+
+        if (!$found) {
+            echo "Aucun livre trouvé.\n";
+        }
+    }
 }
