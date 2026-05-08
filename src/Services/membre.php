@@ -34,6 +34,7 @@ while (true) {
             case 4:
 
                 $input=readline("Entrez le titre ou l'auteur:");
+                $book=$library->getAllBooks();
 
             case 0:
                 exit("Au revoir ! merci pour votre visite");
