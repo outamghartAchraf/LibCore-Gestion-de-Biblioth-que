@@ -30,6 +30,11 @@ while (true) {
     $library->returnBook($emprunter, $bookID);
             break;
 
+
+            case 4:
+
+                $input=readline("Entrez le titre ou l'auteur:");
+
             case 0:
                 exit("Au revoir ! merci pour votre visite");
 
