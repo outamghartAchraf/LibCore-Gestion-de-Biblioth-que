@@ -1,13 +1,16 @@
 <?php
 require_once __DIR__ . "/Library.php";
+require_once dirname(__DIR__) . '/../config/db.php';
 
 class Membre
 {
     private $library;
+    private $pdo;
 
     public function __construct()
     {
         $this->library = new Library();
+        $this->pdo = DB::connect();
     }
 
     public function afficherLivres()
@@ -27,7 +30,8 @@ class Membre
 
     public function rechercherLivre($input)
     {
-        $books = $this->library->getAllBooks();
+          $sqlState = $this->pdo->query("SELECT * FROM books");
+        $books = $sqlState->fetchAll(PDO::FETCH_OBJ);
 
         $resultats = [];
 
