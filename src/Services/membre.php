@@ -34,12 +34,14 @@ while (true) {
             case 4:
 
                 $input=readline("Entrez le titre ou l'auteur:");
-                $book=$library->getAllBooks();
+                $books=$library->getAllBooks();
                 $trouveLivre= false;
 
                 foreach ($books as $book){
                  
                 if( stripos($book['title'],$input) !== false || stripos($book['author'],$input) !==false  ){
+
+
             echo "ID: {$book['id']} | ";
             echo "Titre: {$book['title']} | ";
             echo "Auteur: {$book['author']} | ";
