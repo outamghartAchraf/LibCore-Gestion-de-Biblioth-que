@@ -5,7 +5,7 @@ class Env {
     public static function load($path) {
 
         if (!file_exists($path)) {
-            echo(".env file not found");
+            die(".env file not found");
         }
 
         $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -18,4 +18,3 @@ class Env {
         }
     }
 }
-

@@ -23,3 +23,4 @@ class DB {
     }
 }
 
+echo DB::connect() ? "DB connection" : "falid";
