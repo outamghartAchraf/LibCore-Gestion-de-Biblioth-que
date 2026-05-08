@@ -1,6 +1,7 @@
 <?php
 
-require_once "mainAdmin.php";
+require_once __DIR__ . "/mainAdmin.php";
+require_once __DIR__ . "/mainMember.php";
 
 while (true) {
 
@@ -23,7 +24,8 @@ while (true) {
             break;
 
         case "2":
-            echo "membret not found";
+            $member = new MainMember();
+            $member->run();
             break;
 
         case "0":
