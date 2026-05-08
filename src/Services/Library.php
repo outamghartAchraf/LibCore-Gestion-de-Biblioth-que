@@ -1,6 +1,5 @@
 <?php
 include_once __DIR__ . "/../../config/db.php";
-
 class Library
 {
     public $pdo;
@@ -16,7 +15,10 @@ class Library
         $books = $sqlState->fetchAll(PDO::FETCH_OBJ);
 
         echo "\n===== BOOKS LIST =====\n";
-
+        if(empty($books)) {
+            echo "not found book";
+            exit;
+        }
         foreach ($books as $book) {
             echo "ID: {$book->id} | Title: {$book->title} | Author: {$book->author} | Status: {$book->status}\n";
         }

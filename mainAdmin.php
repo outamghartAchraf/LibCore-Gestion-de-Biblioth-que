@@ -3,8 +3,8 @@
 require_once __DIR__ . "/src/Services/Library.php";
 
 $library = new Library();
-while (true) {
 
+while (true) {
     echo "\n===================================\n";
     echo "   LIBRARIAN DASHBOARD\n";
     echo "=====================================\n";
@@ -22,43 +22,36 @@ while (true) {
     flush();
     $choice = readline();
 
-
     switch ($choice) {
         case 1:
             $library->getAllBooks();
             break;
 
         case 2:
-
             $library->addBook();
             break;
 
         case 3:
-
             $library->addMember();
             break;
 
         case 4:
-
             $library->getAllBooks();
             $library->borrowBook();
 
             break;
 
         case 5:
-
             $library->returnBook();
             break;
 
         case 6:
-
             $library->getAllBooks();
             $library->deleteBook();
 
             break;
 
         case 7:
-
             $library->getAllBooks();
             $library->markAsRepair();
 
@@ -68,8 +61,5 @@ while (true) {
 
         default :
             echo "invalide operation !";
-
     }
-
-
 }
