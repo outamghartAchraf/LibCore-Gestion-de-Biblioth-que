@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#09090b">
+  <title>LibCore | Interactive Terminal Demo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      background: #09090b;
+      color: #e4e4e7;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --muted: #8b8b98;
+      --cyan: #67e8f9;
+      --blue: #60a5fa;
+      --border: rgba(148, 163, 184, .17);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 50% -20%, rgba(37, 99, 235, .17), transparent 55%),
+        #09090b;
+    }
+
+    button, input { font: inherit; }
+
+    .page {
+      width: min(1060px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+
+    .intro { margin: 0 0 22px; }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--cyan);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      color: #fafafa;
+      font-size: clamp(24px, 4vw, 36px);
+      letter-spacing: -.06em;
+    }
+    .subtitle {
+      max-width: 650px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font: 14px/1.7 system-ui, sans-serif;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .help {
+      color: #a1a1aa;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .help strong { color: #d4d4d8; font-weight: 500; }
+    .reset {
+      flex: 0 0 auto;
+      padding: 9px 13px;
+      border: 1px solid rgba(103, 232, 249, .3);
+      border-radius: 8px;
+      background: rgba(8, 47, 73, .24);
+      color: var(--cyan);
+      cursor: pointer;
+      font-size: 12px;
+      transition: background .16s ease, border-color .16s ease;
+    }
+    .reset:hover {
+      border-color: rgba(103, 232, 249, .65);
+      background: rgba(8, 47, 73, .48);
+    }
+
+    .terminal {
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, .22);
+      border-radius: 13px;
+      background: rgba(12, 12, 16, .86);
+      box-shadow: 0 24px 90px rgba(0, 0, 0, .48), 0 0 50px rgba(37, 99, 235, .08);
+      backdrop-filter: blur(18px);
+    }
+    .window-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 45px;
+      padding: 0 15px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(110deg, rgba(39, 39, 42, .86), rgba(24, 24, 27, .7));
+    }
+    .window-controls { display: flex; gap: 7px; }
+    .control {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2);
+    }
+    .control.red { background: #ff5f57; }
+    .control.yellow { background: #febc2e; }
+    .control.green { background: #28c840; }
+    .window-title {
+      color: #b4b4bd;
+      font-size: 11px;
+      letter-spacing: .02em;
+    }
+    .window-spacer { width: 44px; }
+
+    .screen {
+      height: min(64vh, 590px);
+      min-height: 330px;
+      overflow-y: auto;
+      padding: 22px 24px 12px;
+      scrollbar-color: #3f3f46 transparent;
+      scrollbar-width: thin;
+    }
+    .line {
+      min-height: 1.55em;
+      color: #d4d4d8;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+    .line.menu { color: #e4e4e7; }
+    .line.accent { color: var(--cyan); }
+    .line.success { color: #86efac; }
+    .line.error { color: #fda4af; }
+    .line.muted { color: #8b8b98; }
+    .input-row {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      min-height: 34px;
+      padding: 0 24px 15px;
+    }
+    .prompt-label {
+      flex: 0 0 auto;
+      color: var(--blue);
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    #command {
+      width: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #f4f4f5;
+      caret-color: var(--cyan);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    #command:disabled { opacity: .5; }
+    .statusbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 15px;
+      border-top: 1px solid var(--border);
+      background: rgba(24, 24, 27, .55);
+      color: #71717a;
+      font-size: 10px;
+    }
+    .status-ready { color: #86efac; }
+
+    @media (max-width: 600px) {
+      .page { width: min(100% - 24px, 1060px); padding: 28px 0 20px; }
+      .subtitle { font-size: 13px; }
+      .toolbar { align-items: flex-start; }
+      .help { max-width: 62%; font-size: 10px; }
+      .reset { padding: 8px 10px; font-size: 10px; }
+      .screen { height: 62vh; min-height: 320px; padding: 16px 14px 10px; }
+      .input-row { gap: 6px; padding: 0 14px 13px; }
+      .line, #command, .prompt-label { font-size: 12px; }
+      .window-bar { min-height: 40px; }
+      .window-title { font-size: 10px; }
+      .statusbar { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <p class="eyebrow">LibCore · Library Management System</p>
+      <h1>Interactive Web Terminal</h1>
+      <p class="subtitle">Explore the librarian and member dashboards. Your demo books, members, and loans are saved in this browser.</p>
+    </header>
+
+    <div class="toolbar">
+      <div class="help"><strong>Quick help</strong> · Enter a menu number; use <strong>0</strong> to go back. Sample member: ID <strong>1</strong> (MEM-001). Reset restores demo data.</div>
+      <button class="reset" id="reset" type="button">Reset Demo Data</button>
+    </div>
+
+    <section class="terminal" aria-label="LibCore terminal simulator">
+      <div class="window-bar">
+        <div class="window-controls" aria-hidden="true">
+          <span class="control red"></span><span class="control yellow"></span><span class="control green"></span>
+        </div>
+        <div class="window-title">libcore — bash — 80×24</div>
+        <div class="window-spacer"></div>
+      </div>
+      <div class="screen" id="screen" role="log" aria-live="polite" aria-relevant="additions"></div>
+      <label class="input-row">
+        <span class="prompt-label" id="prompt-label"></span>
+        <input id="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input">
+      </label>
+      <div class="statusbar">
+        <span>LIBCORE DEMO · LOCAL STORAGE</span>
+        <span class="status-ready" id="status">● READY</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "libcore-demo-data-v1";
+      const screen = document.getElementById("screen");
+      const input = document.getElementById("command");
+      const promptLabel = document.getElementById("prompt-label");
+      const status = document.getElementById("status");
+      const lines = [];
+      let database;
+      let prompt = { label: "Choose option: ", submit: handleMainChoice };
+      let dashboard = "main";
+
+      function sampleData() {
+        return {
+          books: [
+            { id: 1, title: "Clean Code", author: "Robert C. Martin", isbn: "9780132350884", libraryId: 1, status: "available" },
+            { id: 2, title: "Design Patterns", author: "Erich Gamma et al.", isbn: "9780201633610", libraryId: 1, status: "available" },
+            { id: 3, title: "Refactoring", author: "Martin Fowler", isbn: "9780201485677", libraryId: 1, status: "borrowed" }
+          ],
+          members: [
+            { id: 1, name: "Alex Morgan", email: "alex@example.com", type: "student", membershipNo: "MEM-001", isActive: true }
+          ],
+          loans: [
+            { id: 1, memberId: 1, bookId: 3, borrowDate: "2025-01-12", returnDate: null, status: "borrowed" }
+          ],
+          nextBookId: 4,
+          nextMemberId: 2,
+          nextLoanId: 2
+        };
+      }
+
+      function loadData() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (!saved) {
+            database = sampleData();
+            saveData();
+            return;
+          }
+          const parsed = JSON.parse(saved);
+          if (!parsed || !Array.isArray(parsed.books) || !Array.isArray(parsed.members) || !Array.isArray(parsed.loans)) {
+            throw new Error("Stored demo data has an invalid shape.");
+          }
+          database = parsed;
+          database.nextBookId = Number(database.nextBookId) || nextId(database.books);
+          database.nextMemberId = Number(database.nextMemberId) || nextId(database.members);
+          database.nextLoanId = Number(database.nextLoanId) || nextId(database.loans);
+        } catch (error) {
+          console.error("Could not load LibCore demo data:", error);
+          database = sampleData();
+          saveData();
+        }
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+        } catch (error) {
+          console.error("Could not persist LibCore demo data:", error);
+          write("Warning: changes could not be saved in this browser.", "error");
+        }
+      }
+
+      function nextId(records) {
+        return records.reduce((max, record) => Math.max(max, Number(record.id) || 0), 0) + 1;
+      }
+
+      function write(text = "", style = "") {
+        lines.push({ text: String(text), style });
+        const row = document.createElement("div");
+        row.className = `line${style ? ` ${style}` : ""}`;
+        row.textContent = String(text);
+        screen.appendChild(row);
+        screen.scrollTop = screen.scrollHeight;
+      }
+
+      function writeMenu(title, entries) {
+        write("");
+        write("===================================", "muted");
+        write(title, "accent");
+        write("===================================", "muted");
+        entries.forEach((entry) => write(entry, "menu"));
+        write("");
+      }
+
+      function showMainMenu() {
+        dashboard = "main";
+        writeMenu("        LIBCORE DASHBOARD", [
+          "1. Admin Dashboard",
+          "2. Member Dashboard",
+          "0. Exit"
+        ]);
+        setPrompt("Choose option: ", handleMainChoice);
+      }
+
+      function showAdminMenu() {
+        dashboard = "admin";
+        writeMenu("      LIBRARIAN DASHBOARD", [
+          "1. Show Books (Stock)",
+          "2. Add Book",
+          "3. Create Member",
+          "4. Borrow Book",
+          "5. Return Book",
+          "6. Delete Book",
+          "7. Mark Book as Under Repair",
+          "0. Exit"
+        ]);
+        setPrompt("Choose option: ", handleAdminChoice);
+      }
+
+      function showMemberMenu(first = false) {
+        dashboard = "member";
+        if (first) write(" ==== DASHBOARD MEMBRE ====", "accent");
+        write("");
+        write("1 - Afficher tous les livres", "menu");
+        write("2 - Emprunter un livre", "menu");
+        write("3 - Retourner un livre", "menu");
+        write("4 - Rechercher un livre", "menu");
+        write("0 - Quitter", "menu");
+        write("");
+        setPrompt("Choisissez une option: ", handleMemberChoice);
+      }
+
+      function setPrompt(label, submit) {
+        prompt = { label, submit };
+        promptLabel.textContent = label;
+        input.value = "";
+        input.disabled = false;
+        status.textContent = dashboard === "exit" ? "● SESSION ENDED" : "● READY";
+        if (dashboard !== "exit") input.focus();
+      }
+
+      function askSequence(fields, complete) {
+        const values = [];
+        let index = 0;
+        const askNext = () => {
+          const field = fields[index];
+          setPrompt(field.label, (value) => {
+            values.push(value);
+            index += 1;
+            if (index < fields.length) askNext();
+            else complete(values);
+          });
+        };
+        askNext();
+      }
+
+      function handleMainChoice(choice) {
+        switch (choice.trim()) {
+          case "1": showAdminMenu(); break;
+          case "2": showMemberMenu(true); break;
+          case "0":
+            write("Good Bye ", "muted");
+            dashboard = "exit";
+            setPrompt("", () => {});
+            input.disabled = true;
+            status.textContent = "● SESSION ENDED";
+            break;
+          default:
+            write("Invalid option", "error");
+            showMainMenu();
+        }
+      }
+
+      function handleAdminChoice(choice) {
+        switch (choice.trim()) {
+          case "1":
+            listBooks();
+            showAdminMenu();
+            break;
+          case "2": addBook(); break;
+          case "3": addMember(); break;
+          case "4":
+            listBooks();
+            askSequence([
+              { label: "Enter Member ID: " },
+              { label: "Enter Book ID: " }
+            ], ([memberId, bookId]) => {
+              borrowBook(memberId, bookId);
+              showAdminMenu();
+            });
+            break;
+          case "5":
+            askSequence([
+              { label: "Enter Loan ID: " },
+              { label: "Enter Book ID: " }
+            ], ([loanId, bookId]) => {
+              returnBook(loanId, bookId);
+              showAdminMenu();
+            });
+            break;
+          case "6":
+            listBooks();
+            askSequence([{ label: "Enter Book ID to delete: " }], ([bookId]) => {
+              deleteBook(bookId);
+              showAdminMenu();
+            });
+            break;
+          case "7":
+            listBooks();
+            askSequence([{ label: "Enter Book ID to delete: " }], ([bookId]) => {
+              markAsRepair(bookId);
+              showAdminMenu();
+            });
+            break;
+          case "0":
+            write("Good Bye ", "muted");
+            showMainMenu();
+            break;
+          default:
+            write("Invalid operation ", "error");
+            showAdminMenu();
+        }
+      }
+
+      function handleMemberChoice(choice) {
+        switch (choice.trim()) {
+          case "1":
+            database.books.forEach(printBook);
+            showMemberMenu();
+            break;
+          case "2":
+            askSequence([
+              { label: "Enter Member ID: " },
+              { label: "Enter Book ID: " }
+            ], ([memberId, bookId]) => {
+              borrowBook(memberId, bookId);
+              showMemberMenu();
+            });
+            break;
+          case "3":
+            askSequence([
+              { label: "Enter Loan ID: " },
+              { label: "Enter Book ID: " }
+            ], ([loanId, bookId]) => {
+              returnBook(loanId, bookId);
+              showMemberMenu();
+            });
+            break;
+          case "4":
+            askSequence([{ label: "Enter title or author: " }], ([term]) => {
+              searchBooks(term);
+              showMemberMenu();
+            });
+            break;
+          case "0":
+            write("Good Bye ", "muted");
+            showMainMenu();
+            break;
+          default:
+            write("Invalid option", "error");
+            showMemberMenu();
+        }
+      }
+
+      function printBook(book) {
+        write(`ID: ${book.id} | Title: ${book.title} | Author: ${book.author} | Status: ${book.status}`);
+      }
+
+      function listBooks() {
+        write("");
+        write("===== BOOKS LIST =====", "accent");
+        if (database.books.length === 0) {
+          write("not found book", "muted");
+          return;
+        }
+        database.books.forEach(printBook);
+      }
+
+      function addBook() {
+        askSequence([
+          { label: "Enter Title: " },
+          { label: "Enter Author: " },
+          { label: "Enter ISBN: " },
+          { label: "Enter Library ID: " }
+        ], ([title, author, isbn, libraryId]) => {
+          if (![title, author, isbn, libraryId].every((value) => value.trim())) {
+            write("All fields are required!", "error");
+          } else {
+            const parsedLibraryId = Number.parseInt(libraryId, 10);
+            if (!Number.isInteger(parsedLibraryId) || parsedLibraryId < 1) {
+              write("Invalid Library ID", "error");
+            } else {
+              database.books.push({
+                id: database.nextBookId++,
+                title: title.trim(),
+                author: author.trim(),
+                isbn: isbn.trim(),
+                libraryId: parsedLibraryId,
+                status: "available"
+              });
+              saveData();
+              write("Book created successfully", "success");
+            }
+          }
+          showAdminMenu();
+        });
+      }
+
+      function addMember() {
+        askSequence([
+          { label: "Enter Name: " },
+          { label: "Enter Email: " },
+          { label: "Enter Type (student/professor): " },
+          { label: "Enter Membership No: " }
+        ], ([name, email, type, membershipNo]) => {
+          if (![name, email, type, membershipNo].every((value) => value.trim())) {
+            write("All fields are required", "error");
+          } else if (database.members.some((member) => member.membershipNo.toLowerCase() === membershipNo.trim().toLowerCase())) {
+            write("Membership No already exists", "error");
+          } else {
+            database.members.push({
+              id: database.nextMemberId++,
+              name: name.trim(),
+              email: email.trim(),
+              type: type.trim(),
+              membershipNo: membershipNo.trim(),
+              isActive: true
+            });
+            saveData();
+            write("Member created successfully", "success");
+          }
+          showAdminMenu();
+        });
+      }
+
+      function findById(records, value) {
+        const id = Number.parseInt(value, 10);
+        if (!/^\d+$/.test(value.trim()) || !Number.isSafeInteger(id) || id < 1) return null;
+        return records.find((record) => record.id === id) || null;
+      }
+
+      function borrowBook(memberValue, bookValue) {
+        if (!memberValue.trim() || !bookValue.trim()) {
+          write("Member ID and Book ID are required", "error");
+          return;
+        }
+        const member = findById(database.members, memberValue);
+        const book = findById(database.books, bookValue);
+        if (!member) {
+          write("Invalid Member ID", "error");
+          return;
+        }
+        if (!book || book.status !== "available") {
+          write("Book not available", "error");
+          return;
+        }
+        database.loans.push({
+          id: database.nextLoanId++,
+          memberId: member.id,
+          bookId: book.id,
+          borrowDate: new Date().toISOString().slice(0, 10),
+          returnDate: null,
+          status: "borrowed"
+        });
+        book.status = "borrowed";
+        saveData();
+        write("Book borrowed successfully!", "success");
+      }
+
+      function returnBook(loanValue, bookValue) {
+        if (!loanValue.trim() || !bookValue.trim()) {
+          write("Loan ID and Book ID are required", "error");
+          return;
+        }
+        const loan = findById(database.loans, loanValue);
+        const book = findById(database.books, bookValue);
+        if (!loan || loan.status !== "borrowed") {
+          write("Invalid Loan ID", "error");
+          return;
+        }
+        if (!book || loan.bookId !== book.id) {
+          write("Invalid Book ID", "error");
+          return;
+        }
+        loan.status = "returned";
+        loan.returnDate = new Date().toISOString().slice(0, 10);
+        book.status = "available";
+        saveData();
+        write("Book returned successfully!", "success");
+      }
+
+      function deleteBook(value) {
+        const book = findById(database.books, value);
+        if (!value.trim()) {
+          write("Required Book ID", "error");
+        } else if (!book) {
+          write("Invalid Book ID", "error");
+        } else if (database.loans.some((loan) => loan.bookId === book.id && loan.status === "borrowed")) {
+          write("Cannot delete a borrowed book", "error");
+        } else {
+          database.books = database.books.filter((record) => record.id !== book.id);
+          saveData();
+          write("Book deleted successfully!", "success");
+        }
+      }
+
+      function markAsRepair(value) {
+        const book = findById(database.books, value);
+        if (!value.trim()) {
+          write("Required Book ID", "error");
+        } else if (!book) {
+          write("Invalid Book ID", "error");
+        } else if (book.status === "borrowed") {
+          write("Cannot mark a borrowed book as under repair", "error");
+        } else {
+          book.status = "repair";
+          saveData();
+          write("Book marked as under repair", "success");
+        }
+      }
+
+      function searchBooks(term) {
+        const query = term.trim().toLocaleLowerCase();
+        const matches = database.books.filter((book) =>
+          book.title.toLocaleLowerCase().includes(query) ||
+          book.author.toLocaleLowerCase().includes(query)
+        );
+        if (!matches.length) {
+          write("Aucun livre trouvé.", "muted");
+          return;
+        }
+        matches.forEach(printBook);
+      }
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" || input.disabled) return;
+        event.preventDefault();
+        const value = input.value;
+        write(`${prompt.label}${value}`);
+        const submit = prompt.submit;
+        input.value = "";
+        submit(value);
+      });
+
+      document.getElementById("reset").addEventListener("click", () => {
+        database = sampleData();
+        saveData();
+        lines.length = 0;
+        screen.replaceChildren();
+        write("Demo data reset.", "success");
+        showMainMenu();
+        input.focus();
+      });
+
+      loadData();
+      write("Welcome to LibCore. Type a menu number to begin.", "muted");
+      showMainMenu();
+    })();
+  </script>
+</body>
+</html>
